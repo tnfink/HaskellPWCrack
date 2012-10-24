@@ -7,6 +7,7 @@ import Test.Hspec
 import Test.QuickCheck
 
 import qualified Data.HashSet as S
+import qualified Data.Text as T
 
 import PWCrack.DictionaryVariations
 
@@ -44,9 +45,9 @@ addBirthdaysSpec :: Spec
 addBirthdaysSpec = do
   describe "addBirthdays" $ do
         it "returns an empty set for an empty word" $
-          addBirthdays "" == S.empty
+          addBirthdays (T.pack "") == S.empty
         it "adds 2-4 numbers in front of the word and one or two after them" $
-          let variants = addBirthdays "password"
+          let variants = addBirthdays (T.pack "password")
               wrongWords = S.filter (\ w -> not $ matchesBirthdayPattern w) variants
           in  (S.size wrongWords) == 0
 
@@ -72,8 +73,8 @@ birthdayPatternSpec = do
 birthdayPattern :: String
 birthdayPattern = "^[[:digit:]]?[[:digit:]][[:digit:]]?[[:digit:]].*[[:digit:]]?[[:digit:]]$"
 
-matchesBirthdayPattern :: String -> Bool
-matchesBirthdayPattern word =  word =~ birthdayPattern
+matchesBirthdayPattern :: T.Text -> Bool
+matchesBirthdayPattern word =  (T.unpack word) =~ birthdayPattern
         
 -- Testdata
 --------------------------------------------------------                            

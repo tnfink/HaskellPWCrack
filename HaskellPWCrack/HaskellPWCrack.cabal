@@ -7,10 +7,10 @@ executable pwcrack
   hs-source-dirs:  src/main
   main-is:         Main.hs
   build-depends:   base >= 4,
-                   unordered-containers == 0.2.2.1,
-                   bytestring == 0.9.2.1,
-                   text == 0.11.2.0,
-                   directory == 1.1.0.2
+                   unordered-containers >= 0.2.2.1,
+                   bytestring >= 0.9.2.1,
+                   text >= 0.11.2.0,
+                   directory >= 1.1.0.2
   ghc-options:     -Wall
   default-language: Haskell2010
   other-modules:   PWCrack.DictionaryVariations
@@ -18,11 +18,11 @@ executable pwcrack
 test-suite UnitTestSuite
   type:            exitcode-stdio-1.0
   build-depends:   base >= 4,
-                   unordered-containers == 0.2.2.1,
-                   hspec == 1.3.0.1,
-                   QuickCheck == 2.4.2,
-                   regex-tdfa == 1.1.8,
-                   text == 0.11.2.0
+                   unordered-containers >= 0.2.2.1,
+                   hspec >= 1.3.0.1,
+                   QuickCheck >= 2.4.2,
+                   regex-tdfa >= 1.1.8,
+                   text >= 0.11.2.0
   ghc-options:     -Wall
   main-is:         Main.hs
   other-modules:   PWCrack.DictionaryVariationsSpec
@@ -31,7 +31,8 @@ test-suite UnitTestSuite
 
 test-suite MaxOsXKeyChainAttack
   type:            exitcode-stdio-1.0
-  build-depends:   base >= 4
+  build-depends:   base >= 4,
+                   process >= 1.1.0.1
   ghc-options:     -Wall
   main-is:         Main.hs
   default-language: Haskell2010

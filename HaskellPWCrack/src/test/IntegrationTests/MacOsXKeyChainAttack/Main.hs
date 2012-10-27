@@ -6,13 +6,12 @@ import System.Exit
 main::IO()
 main = do
   (exitCode, stdout , stderr) <- readProcessWithExitCode pathToPwCrack arguments testStandardInput
+  putStrLn $ "Exit-Code:" ++ (show exitCode)
+  putStrLn $ "stdout:\n" ++ stdout
+  putStrLn $ "stderr:\n" ++ stderr
   case exitCode of
-    ExitSuccess      -> exitSuccess
-    ExitFailure code -> do
-      putStrLn $ "Exit-Code:" ++ (show code)
-      putStrLn $ "stdout:\n" ++ stdout
-      putStrLn $ "stderr:\n" ++ stderr
-      exitFailure
+    ExitSuccess   -> exitSuccess
+    ExitFailure _ -> exitFailure
 
  where
   pathToPwCrack = "dist/build/pwcrack/pwcrack"

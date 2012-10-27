@@ -36,11 +36,21 @@ main = do
   where
     printHelp = putStrLn $ usageInfo "Usage: pwcrack [option]" suppportedOptions
 
-checkAndDoAttackKeyChain :: String -> IO()
+checkAndDoAttackKeyChain :: FilePath -> IO ()
 checkAndDoAttackKeyChain keyChainPath = do
-  exist <- doesFileExist keyChainPath
-  if exist then attackMacOsXKeyChain keyChainPath
-           else failAndExit $ "The key chain "++keyChainPath ++ " does not exist."
+  canonicalKeyChainPath <- canonicalizePath keyChainPath
+  exist <- doesFileExist canonicalKeyChainPath
+  if exist
+   then do
+    maybePassword <- attackMacOsXKeyChain canonicalKeyChainPath
+    case maybePassword of
+        Just password -> putStrLn $ "And the password is:" ++ (show password)
+        Nothing       -> do
+          putStrLn $ "No password was found. Sorry."
+          exitWith $ ExitFailure 1
+   else
+    failAndExit $ "The key chain "++keyChainPath ++ " does not exist."
+
 
 failAndExit :: String -> IO()
 failAndExit reason = do

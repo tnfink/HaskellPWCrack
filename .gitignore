@@ -1,2 +1,5 @@
 HaskellPWCrack/.dist-buildwrapper/**/*
 HaskellPWCrack/dist
+**/*.iml
+**/*.ipr
+.idea/**/*

@@ -9,12 +9,13 @@ executable pwcrack
   build-depends:   base >= 4,
                    unordered-containers == 0.2.2.1,
                    bytestring == 0.9.2.1,
-                   text == 0.11.2.0
+                   text == 0.11.2.0,
+                   directory == 1.1.0.2
   ghc-options:     -Wall
   default-language: Haskell2010
   other-modules:   PWCrack.DictionaryVariations
 
-test-suite DictionaryVariantsTestSuite
+test-suite UnitTestSuite
   type:            exitcode-stdio-1.0
   build-depends:   base >= 4,
                    unordered-containers == 0.2.2.1,
@@ -26,6 +27,6 @@ test-suite DictionaryVariantsTestSuite
   main-is:         Main.hs
   other-modules:   PWCrack.DictionaryVariationsSpec
   default-language: Haskell2010
-  hs-source-dirs:  src/test, src/main
+  hs-source-dirs:  src/test/UnitTests, src/main
 
 

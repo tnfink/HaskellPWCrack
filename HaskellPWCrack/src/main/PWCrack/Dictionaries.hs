@@ -1,6 +1,9 @@
-module PWCrack.Dictionaries(generateListOfPasswords) where
+module PWCrack.Dictionaries(generateListOfPasswords
+
+) where
 
 import qualified Data.Text as T
+import qualified Data.HashSet as S
 
 import PWCrack.DictionaryVariations
 
@@ -23,4 +26,12 @@ generalVariations = [ permutateUpperLowerCase ]
 
 
 generateListOfPasswords :: [T.Text]
-generateListOfPasswords = dicWords nameDictionary
+generateListOfPasswords =
+   S.toList allVariations
+  where
+     nameVariations = applyVariations nameDictionary;
+     allVariations = applyGeneralVariations nameVariations;
+
+applyVariations = undefined
+
+applyGeneralVariations = undefined

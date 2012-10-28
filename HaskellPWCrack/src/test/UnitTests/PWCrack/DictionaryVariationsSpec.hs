@@ -79,5 +79,5 @@ matchesBirthdayPattern word =  (T.unpack word) =~ birthdayPattern
 -- Testdata
 --------------------------------------------------------                            
 pwords :: Gen String
-pwords = resize 10  $ listOf $ choose ('A','z')
+pwords = resize 5  $ listOf $ choose ('A','z')
         

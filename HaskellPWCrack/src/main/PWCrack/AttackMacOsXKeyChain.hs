@@ -4,13 +4,21 @@ import qualified Data.Text as T
 import System.Process
 import System.Exit
 
+import PWCrack.Dictionaries
 
 attackMacOsXKeyChain :: FilePath -> IO (Maybe T.Text)
-attackMacOsXKeyChain keychain = do
-  let password = T.pack "12otto99"
-  success <- testPassword keychain password
-  if success then return $ Just password
-             else return Nothing
+attackMacOsXKeyChain keychain =
+  checkPasswords generateListOfPasswords
+ where
+  checkPasswords :: [T.Text] -> IO (Maybe T.Text)
+  checkPasswords [] = return Nothing
+  checkPasswords (password : passwords) = do
+    foundPassword <- testPassword keychain password
+    if foundPassword
+      then return $ Just password
+      else checkPasswords passwords
+
+
 
 testPassword :: FilePath -> T.Text -> IO Bool
 testPassword keychain password = do

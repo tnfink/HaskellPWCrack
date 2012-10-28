@@ -14,7 +14,9 @@ executable pwcrack
                    process >= 1.1.0.1
   ghc-options:     -Wall
   default-language: Haskell2010
-  other-modules:   PWCrack.DictionaryVariations
+  other-modules:   PWCrack.DictionaryVariations,
+                   PWCrack.Dictionaries
+  default-extensions: OverloadedStrings
 
 test-suite UnitTestSuite
   type:            exitcode-stdio-1.0
@@ -38,4 +40,5 @@ test-suite MaxOsXKeyChainAttack
   main-is:         Main.hs
   default-language: Haskell2010
   hs-source-dirs:  src/test/IntegrationTests/MacOsXKeyChainAttack, src/main
+
 

@@ -2,12 +2,24 @@ module PWCrack.Dictionaries(generateListOfPasswords) where
 
 import qualified Data.Text as T
 
-data Dictionary = Dictionary { dicWords :: [T.Text] }
+import PWCrack.DictionaryVariations
+
+data Dictionary =
+  Dictionary { dicWords :: [T.Text]
+             , dicVariations :: [DictionaryVariation]
+             }
 
 nameDictionary :: Dictionary
 nameDictionary = Dictionary
-  [ "adam", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
-  ]
+  { dicWords =
+     [ "adam", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
+     ]
+  , dicVariations =
+     [ addBirthdays ]
+  }
+
+generalVariations :: [DictionaryVariation]
+generalVariations = [ permutateUpperLowerCase ]
 
 
 generateListOfPasswords :: [T.Text]

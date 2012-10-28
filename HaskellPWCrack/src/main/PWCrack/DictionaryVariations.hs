@@ -1,31 +1,38 @@
 module PWCrack.DictionaryVariations( permutateUpperLowerCase
                                    , addBirthdays
+                                   , DictionaryVariation
                                    ) where
 
 import qualified Data.HashSet as S
 import Data.Char
 import qualified Data.Text as T
 
+type DictionaryVariation = T.Text -> S.HashSet T.Text
+
 -- Permutate upper and lower case
 --------------------------------------------------------
 
-permutateUpperLowerCase :: String -> S.HashSet String
+permutateUpperLowerCase :: DictionaryVariation
 permutateUpperLowerCase word = permutatedWords
   where permutatedList = permutateUpperLowerCaseIter word
         allPermutatedWords = S.fromList permutatedList
         permutatedWords = S.delete word allPermutatedWords
   
    
-permutateUpperLowerCaseIter :: String -> [String]          
-permutateUpperLowerCaseIter [] = []
-permutateUpperLowerCaseIter (y:ys) =
-  (prependChar y permutatedYs) ++
-  (prependChar (toggleCharacter y) permutatedYs)
-    where permutatedYs = permutateUpperLowerCaseIter ys
+permutateUpperLowerCaseIter :: T.Text -> [T.Text]
+permutateUpperLowerCaseIter word
+  | T.null word = []
+  | otherwise =
+      (prependChar firstChar permutatedTail) ++
+      (prependChar toggledFirstChar permutatedTail)
+     where
+       firstChar = T.head word
+       toggledFirstChar = toggleCharacter firstChar
+       permutatedTail = permutateUpperLowerCaseIter $ T.tail word
              
-prependChar ::  Char -> [[Char]] -> [[Char]]
-prependChar prefix [] = [[prefix]]
-prependChar prefix listOfWords = map (\word -> prefix : word) listOfWords
+prependChar ::  Char -> [T.Text] -> [T.Text]
+prependChar prefix [] = [T.pack [prefix]]
+prependChar prefix listOfWords = map (\word -> prefix `T.cons` word) listOfWords
 
 toggleCharacter :: Char -> Char
 toggleCharacter c 

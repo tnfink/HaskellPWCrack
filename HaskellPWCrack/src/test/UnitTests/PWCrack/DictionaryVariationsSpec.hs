@@ -34,8 +34,9 @@ permutateUpperLowerCaseSpec = do
           permutateUpperLowerCase "a:" == S.singleton("A:")
     it "creates at most 2^l - 1 variations for a word of length l, because it does not put the word itself in the result" 
       $ property $ 
-          forAll pwords (\word -> S.size (permutateUpperLowerCase word) <= 
-                                  ( 2 ^ (length word) - 1))
+          forAll pwords (\word -> let wordText = T.pack word
+                                  in S.size (permutateUpperLowerCase wordText) <=
+                                     ( 2 ^ (T.length wordText) - 1))
                                 
 
 -- addBirthdays
@@ -56,28 +57,27 @@ birthdayPatternSpec :: Spec
 birthdayPatternSpec = do
   describe "birthdayPatternSpec" $ do
     it "accepts 4 digits at the start and 2 digits at the end" $
-       ("3112asd12" =~ birthdayPattern) == True
+       (matchesBirthdayPattern "3112asd12") == True
     it "accepts 3 digits at the start and 2 digits at the end" $
-       ("112asd12" =~ birthdayPattern) == True
+       (matchesBirthdayPattern "112asd12") == True
     it "accepts 2 digits at the start and 2 digits at the end" $
-       ("11asd12" =~ birthdayPattern) == True
+       (matchesBirthdayPattern "11asd12") == True
     it "accepts 2 digits at the start and 1 digit at the end" $
-       ("11asd1" =~ birthdayPattern) == True
+       (matchesBirthdayPattern "11asd1") == True
     it "does not accept empty strings" $ do
-       ("" =~ birthdayPattern) == False       
+       (matchesBirthdayPattern "") == False
     it "does not accept strings starting with a letter" $ do
-       ("x1234asd56" =~ birthdayPattern) == False
+       (matchesBirthdayPattern "x1234asd56") == False
     it "does not accept strings ending with a letter" $ do
-       ("1234asd56y" =~ birthdayPattern) == False
+       (matchesBirthdayPattern "1234asd56y") == False
 
 birthdayPattern :: String
 birthdayPattern = "^[[:digit:]]?[[:digit:]][[:digit:]]?[[:digit:]].*[[:digit:]]?[[:digit:]]$"
 
 matchesBirthdayPattern :: T.Text -> Bool
 matchesBirthdayPattern word =  (T.unpack word) =~ birthdayPattern
-        
+
 -- Testdata
 --------------------------------------------------------                            
 pwords :: Gen String
-pwords = resize 5  $ listOf $ choose ('A','z')
-        
+pwords = resize 5  $ listOf1 $ choose ('A','z')

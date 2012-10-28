@@ -25,7 +25,7 @@ permutateUpperLowerCaseSpec :: Spec
 permutateUpperLowerCaseSpec = do
   describe "permutateUpperLowerCase" $ do
     it "creates an empty set for an emtpy word" $
-      permutateUpperLowerCase "" == S.empty
+      permutateUpperLowerCase "" `shouldBe` S.empty
     it "turns a small a to a capital A" $
           permutateUpperLowerCase "a" `shouldBe` S.singleton("A")
     it "turns a capital A to a small a" $

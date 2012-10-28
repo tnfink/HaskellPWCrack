@@ -1,1 +1,1 @@
-ghci -isrc/main:src/test -cpp -DTEST
+ghci -isrc/main:src/test/UnitTests:src/test/IntegrationTests -cpp -DTEST -XOverloadedStrings

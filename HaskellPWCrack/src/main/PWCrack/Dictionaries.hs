@@ -10,20 +10,18 @@ module PWCrack.Dictionaries
   ) where
 
 import qualified Data.Text as T
-import qualified Data.HashSet as S
-import Data.List
 
 import PWCrack.DictionaryVariations
 
 data Dictionary =
-  Dictionary { dicWords :: S.HashSet T.Text
+  Dictionary { dicWords :: [T.Text]
              , dicVariations :: [DictionaryVariation]
              }
 
 nameDictionary :: Dictionary
 nameDictionary = Dictionary
-  { dicWords = S.fromList
-     [ "adam", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
+  { dicWords =
+     [ "otto", "adam", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
      ]
   , dicVariations =
      [ addBirthdays ]
@@ -37,26 +35,25 @@ generalVariations = [ permutateUpperLowerCase ]
 
 generateListOfPasswords :: [T.Text]
 generateListOfPasswords =
-  S.toList nameVariations
+  allVariations
  where
   nameVariations = applyVariations nameDictionary;
-  -- allVariations = applyGeneralVariations nameVariations;
+  allVariations = applyGeneralVariations nameVariations;
 
-applyVariations :: Dictionary -> S.HashSet T.Text
+applyVariations :: Dictionary -> [T.Text]
 applyVariations dictionary =
   applyVariationsToWords (dicWords dictionary) (dicVariations dictionary)
 
-applyGeneralVariations :: S.HashSet T.Text -> S.HashSet T.Text
+applyGeneralVariations :: [T.Text] -> [T.Text]
 applyGeneralVariations vwords =
   applyVariationsToWords vwords generalVariations
 
-applyVariationsToWords :: S.HashSet T.Text -> [DictionaryVariation] -> S.HashSet T.Text
+applyVariationsToWords :: [T.Text] -> [DictionaryVariation] -> [T.Text]
 applyVariationsToWords dwords variations =
     let combinations =
           [(variation,word) | variation <- variations,
-                              word <- S.toList dwords ]
-        varWords = foldl'(\ set (variation,word) -> S.union (variation word) set)
-                         S.empty combinations
+                              word <- dwords ]
+        varWords = concat $ map (\ (variation,word) -> variation word) combinations
     in -- I have to add to words from the dictionary itself, because the variations avoid them
-       S.union dwords varWords
+        dwords ++ varWords
 

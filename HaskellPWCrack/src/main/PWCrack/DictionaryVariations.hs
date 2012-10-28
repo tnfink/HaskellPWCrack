@@ -3,11 +3,11 @@ module PWCrack.DictionaryVariations( permutateUpperLowerCase
                                    , DictionaryVariation
                                    ) where
 
-import qualified Data.HashSet as S
 import Data.Char
 import qualified Data.Text as T
+import Data.List
 
-type DictionaryVariation = T.Text -> S.HashSet T.Text
+type DictionaryVariation = T.Text -> [T.Text]
 
 -- Permutate upper and lower case
 --------------------------------------------------------
@@ -15,8 +15,7 @@ type DictionaryVariation = T.Text -> S.HashSet T.Text
 permutateUpperLowerCase :: DictionaryVariation
 permutateUpperLowerCase word = permutatedWords
   where permutatedList = permutateUpperLowerCaseIter word
-        allPermutatedWords = S.fromList permutatedList
-        permutatedWords = S.delete word allPermutatedWords
+        permutatedWords = filter (\w -> w /= word) permutatedList
   
    
 permutateUpperLowerCaseIter :: T.Text -> [T.Text]
@@ -44,13 +43,13 @@ toggleCharacter c
 -- add birthdays
 ------------------------------------------------------------------
 
-addBirthdays :: T.Text -> S.HashSet T.Text
+addBirthdays :: DictionaryVariation
 addBirthdays pword
-  | T.null pword = S.empty
+  | T.null pword = []
   | otherwise =  
           let days = map (T.pack . show) ([1..31] :: [Int]) 
               months = map (T.pack . show) ([1..12] :: [Int])
               years = map (T.pack . show) ([0..99] :: [Int])
               allCombinations = [ (d,m,y) | d <- days, m <- months, y <- years ]
-          in foldl (\ set (d,m,y) -> (S.insert (T.concat [d,m,pword,y]) set)) S.empty allCombinations
-        
+          in
+              map (\ (d,m,y) -> T.concat [d,m,pword,y]) allCombinations

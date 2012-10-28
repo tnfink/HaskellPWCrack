@@ -6,7 +6,6 @@ import Text.Regex.TDFA
 import Test.Hspec
 import Test.QuickCheck
 
-import qualified Data.HashSet as S
 import qualified Data.Text as T
 
 import PWCrack.DictionaryVariations
@@ -25,17 +24,17 @@ permutateUpperLowerCaseSpec :: Spec
 permutateUpperLowerCaseSpec = do
   describe "permutateUpperLowerCase" $ do
     it "creates an empty set for an emtpy word" $
-      permutateUpperLowerCase "" `shouldBe` S.empty
+      permutateUpperLowerCase "" `shouldSatisfy` null
     it "turns a small a to a capital A" $
-          permutateUpperLowerCase "a" `shouldBe` S.singleton("A")
+          permutateUpperLowerCase "a" `shouldBe` ["A"]
     it "turns a capital A to a small a" $
-          permutateUpperLowerCase "A" `shouldBe` S.singleton("a")
+          permutateUpperLowerCase "A" `shouldBe` ["a"]
     it "does not change non-letters" $
-          permutateUpperLowerCase "a:" `shouldBe` S.singleton("A:")
+          permutateUpperLowerCase "a:" `shouldBe` ["A:"]
     it "creates at most 2^l - 1 variations for a word of length l, because it does not put the word itself in the result" 
       $ property $ 
           forAll pwords (\word -> let wordText = T.pack word
-                                  in S.size (permutateUpperLowerCase wordText) <=
+                                  in length (permutateUpperLowerCase wordText) <=
                                      ( 2 ^ (T.length wordText) - 1))
                                 
 
@@ -46,11 +45,11 @@ addBirthdaysSpec :: Spec
 addBirthdaysSpec = do
   describe "addBirthdays" $ do
         it "returns an empty set for an empty word" $
-          addBirthdays (T.pack "") `shouldBe` S.empty
+          addBirthdays (T.pack "") `shouldSatisfy` null
         it "adds 2-4 numbers in front of the word and one or two after them" $
           let variants = addBirthdays (T.pack "password")
-              wrongWords = S.filter (\ w -> not $ matchesBirthdayPattern w) variants
-          in  (S.size wrongWords) == 0
+              wrongWords = filter (\ w -> not $ matchesBirthdayPattern w) variants
+          in  (length wrongWords) == 0
 
 
 birthdayPatternSpec :: Spec

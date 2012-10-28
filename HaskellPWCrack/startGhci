@@ -1,1 +1,1 @@
-ghci -isrc/main:src/test
+ghci -isrc/main:src/test -cpp -DTEST

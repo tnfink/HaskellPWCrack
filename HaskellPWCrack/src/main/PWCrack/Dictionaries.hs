@@ -1,6 +1,11 @@
-module PWCrack.Dictionaries(generateListOfPasswords
+{-# LANGUAGE CPP #-}
 
-) where
+module PWCrack.Dictionaries
+  ( generateListOfPasswords
+#ifdef TEST
+  , applyVariations
+#endif
+  ) where
 
 import qualified Data.Text as T
 import qualified Data.HashSet as S

@@ -3,6 +3,8 @@ module Main where
 import System.Process
 import System.Exit
 
+-- TODO: lock Keychain after cracking it
+
 main::IO()
 main = do
   (exitCode, stdout , stderr) <- readProcessWithExitCode pathToPwCrack arguments testStandardInput

@@ -18,38 +18,30 @@ attackMacOsXKeyChain keychain =
   startAttackState = AttackState { testedStringHashes = S.empty }
 
   checkPasswords :: [T.Text] -> Attacker
-  checkPasswords passwords = do
+  checkPasswords [] = return Nothing
+  checkPasswords (password : passwords) = do
     state <- get
-    case passwords of
-      [] -> return Nothing
-      password : passwords -> do
-        let passwordHash = hash password
-            testedStrings = testedStringHashes state
-            numberOfTestedStrings = S.size testedStrings
-        when (numberOfTestedStrings `mod` 1000 == 0)
-          $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings))
-        if (S.member passwordHash testedStrings)
-          then do
-            liftIO $ putStrLn ("skipping "++(T.unpack password))
-            checkPasswords passwords
+    let passwordHash = hash password
+        testedStrings = testedStringHashes state
+        numberOfTestedStrings = S.size testedStrings
+    when (numberOfTestedStrings `mod` 1000 == 0)
+      $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings))
+    if (S.member passwordHash testedStrings)
+      then do
+        liftIO $ putStrLn ("skipping "++(T.unpack password))
+        checkPasswords passwords
+      else do
+        foundPassword <- liftIO $ testPassword keychain password
+        if (foundPassword)
+          then return $ Just password
           else do
-            foundPassword <- liftIO $ testPassword keychain password
-            --liftIO $ putStrLn ("not skipping "++(T.unpack password)++ " result="++(show foundPassword))
-            if (foundPassword)
-              then return $ Just password
-              else do
-                put state { testedStringHashes = S.insert passwordHash testedStrings}
-                checkPasswords passwords
+            put state { testedStringHashes = S.insert passwordHash testedStrings}
+            checkPasswords passwords
 
-
-
-
-
--- todo: check in the hashset, if the password was already used, store only the hashes in the set,
---       hm, oder doch ein Writer? es ist ja nicht wirklich eine kontinuierliche State Transformation...
--- nee, ein monadischer Transformer: http://book.realworldhaskell.org/read/monad-transformers.html
 
 data AttackState = AttackState {
+   -- todo: check if it is ok to use the passwords in the set instead of their hash codes
+   -- todo: maybe save the number of skipped tests
    testedStringHashes :: S.HashSet Int
 } deriving (Show)
 

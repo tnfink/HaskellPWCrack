@@ -21,7 +21,7 @@ data Dictionary =
 nameDictionary :: Dictionary
 nameDictionary = Dictionary
   { dicWords =
-     [ "adam", "otto", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
+     [ "otto","adam", "broder", "eva", "kilian", "lena", "leslie", "marie", "torsten", "uriel"
      ]
   , dicVariations =
      [ addBirthdays ]

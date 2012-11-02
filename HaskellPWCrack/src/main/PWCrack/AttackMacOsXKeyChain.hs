@@ -20,9 +20,9 @@ attackMacOsXKeyChain keychain =
   checkPasswords :: [T.Text] -> Attacker
   checkPasswords [] = return Nothing
   checkPasswords (password : passwords) = do
-    state <- get
+    currentState <- get
     let passwordHash = hash password
-        testedStrings = testedStringHashes state
+        testedStrings = testedStringHashes currentState
         numberOfTestedStrings = S.size testedStrings
     when (numberOfTestedStrings `mod` 1000 == 0)
       $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings))
@@ -35,7 +35,7 @@ attackMacOsXKeyChain keychain =
         if (foundPassword)
           then return $ Just password
           else do
-            put state { testedStringHashes = S.insert passwordHash testedStrings}
+            put currentState { testedStringHashes = S.insert passwordHash testedStrings}
             checkPasswords passwords
 
 
@@ -50,10 +50,7 @@ type Attacker = StateT AttackState IO(Maybe T.Text)
 testPassword :: FilePath -> T.Text -> IO Bool
 testPassword keychain password = do
   -- putStrLn $ "try " ++ passwordString
-  (exitCode, stdout , stderr) <- readProcessWithExitCode security arguments standardInput
-  --putStrLn $ show exitCode
-  --putStrLn stdout
-  --putStrLn stderr
+  (exitCode, _ , _ ) <- readProcessWithExitCode security arguments standardInput
   case exitCode of
     ExitSuccess   -> return True
     ExitFailure _ -> return False

@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module PWCrack.DictionaryVariationsSpec(dictionaryVariationsSpecs) where
 
+import Data.List
 import Text.Regex.TDFA
 
 import Test.Hspec
@@ -26,17 +27,19 @@ permutateUpperLowerCaseSpec = do
     it "creates an empty set for an emtpy word" $
       permutateUpperLowerCase "" `shouldSatisfy` null
     it "turns a small a to a capital A" $
-          permutateUpperLowerCase "a" `shouldBe` ["A"]
+          permutateUpperLowerCase "a" `shouldSatisfy` (sameSet ["A"])
     it "turns a capital A to a small a" $
-          permutateUpperLowerCase "A" `shouldBe` ["a"]
+          permutateUpperLowerCase "A" `shouldSatisfy` (sameSet ["a"])
     it "does not change non-letters" $
-          permutateUpperLowerCase "a:" `shouldBe` ["A:"]
+          permutateUpperLowerCase "a:" `shouldSatisfy` (sameSet ["A:"])
     it "creates at most 2^l - 1 variations for a word of length l, because it does not put the word itself in the result" 
       $ property $ 
           forAll pwords (\word -> let wordText = T.pack word
                                   in length (permutateUpperLowerCase wordText) <=
                                      ( 2 ^ (T.length wordText) - 1))
                                 
+sameSet :: [T.Text] -> [T.Text] -> Bool
+sameSet as bs = (nub as) == (nub bs)
 
 -- addBirthdays
 --------------------------------------------------------                            

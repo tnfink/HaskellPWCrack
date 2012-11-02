@@ -12,10 +12,14 @@ import System.Exit
 import PWCrack.Dictionaries
 
 attackMacOsXKeyChain :: FilePath -> IO (Maybe T.Text)
-attackMacOsXKeyChain keychain =
-  evalStateT (checkPasswords generateListOfPasswords) startAttackState
+attackMacOsXKeyChain keychain = do
+  (result , finalState) <- runStateT (checkPasswords generateListOfPasswords) startAttackState
+  liftIO $ putStrLn ("found "++ (show result) ++" skipped " ++ (show $ skippedTests finalState) ++ " doubles")
+  return result
  where
-  startAttackState = AttackState { testedStringHashes = S.empty }
+  startAttackState = AttackState { testedStringHashes = S.empty
+                                 , skippedTests = 0
+                                 }
 
   checkPasswords :: [T.Text] -> Attacker
   checkPasswords [] = return Nothing
@@ -25,10 +29,11 @@ attackMacOsXKeyChain keychain =
         testedStrings = testedStringHashes currentState
         numberOfTestedStrings = S.size testedStrings
     when (numberOfTestedStrings `mod` 1000 == 0)
-      $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings))
+      $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings) ++ " skipped "++(show $ skippedTests currentState))
     if (S.member passwordHash testedStrings)
       then do
         liftIO $ putStrLn ("skipping "++(T.unpack password))
+        put currentState { skippedTests = 1+(skippedTests currentState)}
         checkPasswords passwords
       else do
         foundPassword <- liftIO $ testPassword keychain password
@@ -39,11 +44,11 @@ attackMacOsXKeyChain keychain =
             checkPasswords passwords
 
 
-data AttackState = AttackState {
-   -- todo: check if it is ok to use the passwords in the set instead of their hash codes
-   -- todo: maybe save the number of skipped tests
-   testedStringHashes :: S.HashSet Int
-} deriving (Show)
+data AttackState =
+  AttackState {  testedStringHashes :: S.HashSet Int
+                 -- todo: check if it is ok to use the passwords in the set instead of their hash codes
+              ,  skippedTests :: Int
+              } deriving (Show)
 
 type Attacker = StateT AttackState IO(Maybe T.Text)
 

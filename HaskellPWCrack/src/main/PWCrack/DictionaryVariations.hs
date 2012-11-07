@@ -1,6 +1,10 @@
+{-# LANGUAGE CPP #-}
 module PWCrack.DictionaryVariations( permutateUpperLowerCase
                                    , addBirthdays
                                    , DictionaryVariation
+#ifdef TEST
+                                   , addBirthdaysWithParameters
+#endif                                   
                                    ) where
 
 import Data.Char
@@ -43,12 +47,37 @@ toggleCharacter c
 ------------------------------------------------------------------
 
 addBirthdays :: DictionaryVariation
-addBirthdays pword
+addBirthdays pword = 
+  foldr (\ dv list -> (dv pword) ++ list) 
+        []  allBirthdayVariants
+    where
+      allBirthdayVariants = [addBirthdaysWithParameters sep upper | sep <- ["","."], upper <- [True, False]]
+
+addBirthdaysWithParameters :: T.Text -> Bool -> DictionaryVariation
+addBirthdaysWithParameters separator upper pword
   | T.null pword = []
-  | otherwise =  
-          let days = map (T.pack . show) ([1..31] :: [Int]) 
-              months = map (T.pack . show) ([1..12] :: [Int])
-              years = map (T.pack . show) ([0..99] :: [Int])
-              allCombinations = [ (d,m,y) | d <- days, m <- months, y <- years ]
-          in
-              map (\ (d,m,y) -> T.concat [d,m,pword,y]) allCombinations
+  | otherwise =  map concatNewPassword allCombinationsOfDayMonthYearWithLeadingZero
+  where pword' = if upper then T.cons (toggleCharacter $ T.head pword)
+                                      $ T.tail pword
+                          else pword
+        concatNewPassword (d,m,y) = T.concat [d,separator,m,separator,pword',separator,y]
+  
+  
+
+firstCiphersWithLeading0 :: [T.Text]
+firstCiphersWithLeading0 = map (T.pack . ((++) "0") . show) ([1..9] :: [Int])
+
+days :: [T.Text]
+days = map (T.pack . show) ([1..31] :: [Int])
+
+months :: [T.Text] 
+months = map (T.pack . show) ([1..12] :: [Int]) 
+
+years :: [T.Text]
+years = map (T.pack . show) ([0..99] :: [Int])
+
+allCombinationsOfDayMonthYearWithLeadingZero :: [(T.Text, T.Text, T.Text)]
+allCombinationsOfDayMonthYearWithLeadingZero = [ (d,m,y) | d <- days ++ firstCiphersWithLeading0, 
+                                                           m <- months ++ firstCiphersWithLeading0, 
+                                                           y <- years ]
+          

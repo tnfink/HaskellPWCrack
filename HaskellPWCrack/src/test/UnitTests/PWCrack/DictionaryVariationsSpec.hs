@@ -16,6 +16,7 @@ dictionaryVariationsSpecs =
   [ permutateUpperLowerCaseSpec
   , addBirthdaysSpec
   , birthdayPatternSpec
+  , birthdayPatternSeparatedSpec
   ]
 
 -- permutateUpperLowerCase
@@ -49,35 +50,70 @@ addBirthdaysSpec = do
   describe "addBirthdays" $ do
         it "returns an empty set for an empty word" $
           addBirthdays (T.pack "") `shouldSatisfy` null
-        it "adds 2-4 numbers in front of the word and one or two after them" $
-          let variants = addBirthdays (T.pack "password")
-              wrongWords = filter (\ w -> not $ matchesBirthdayPattern w) variants
-          in  (length wrongWords) == 0
+        it "generates 2-4 numbers in front of the word and one or two after them possibly separated by ." $
+          (addBirthdaysWithParameters "" False (T.pack "password"))
+          `shouldSatisfy` 
+          (checkBirthdayVariantsWithPattern birthdayPattern)
+        it "generates 2-4 numbers in front of the word and one or two after them separated by ." $
+          (addBirthdaysWithParameters "." True (T.pack "password"))
+          `shouldSatisfy` 
+          (checkBirthdayVariantsWithPattern birthdayPatternSeparated)
 
+checkBirthdayVariantsWithPattern :: String -> [T.Text] -> Bool          
+checkBirthdayVariantsWithPattern pattern variants = null wrongWords
+  where wrongWords = filter (\ word -> not $ (T.unpack word)  =~ pattern) variants
 
 birthdayPatternSpec :: Spec
 birthdayPatternSpec = do
   describe "birthdayPatternSpec" $ do
     it "accepts 4 digits at the start and 2 digits at the end" $
-       (matchesBirthdayPattern "3112asd12") `shouldBe` True
+       "3112asd12" `shouldSatisfy` matchesBirthdayPattern
     it "accepts 3 digits at the start and 2 digits at the end" $
-       (matchesBirthdayPattern "112asd12") `shouldBe` True
+       "112asd12" `shouldSatisfy` matchesBirthdayPattern
     it "accepts 2 digits at the start and 2 digits at the end" $
-       (matchesBirthdayPattern "11asd12") `shouldBe` True
+       "11asd12" `shouldSatisfy` matchesBirthdayPattern
     it "accepts 2 digits at the start and 1 digit at the end" $
-       (matchesBirthdayPattern "11asd1") `shouldBe` True
+       "11asd1" `shouldSatisfy` matchesBirthdayPattern
     it "does not accept empty strings" $ do
-       (matchesBirthdayPattern "") `shouldBe` False
+       "" `shouldSatisfy` not .  matchesBirthdayPattern
     it "does not accept strings starting with a letter" $ do
-       (matchesBirthdayPattern "x1234asd56") `shouldBe` False
+       "x1234asd56" `shouldSatisfy` not .  matchesBirthdayPattern
     it "does not accept strings ending with a letter" $ do
-       (matchesBirthdayPattern "1234asd56y") `shouldBe` False
+       "1234asd56y" `shouldSatisfy` not .  matchesBirthdayPattern
 
 birthdayPattern :: String
 birthdayPattern = "^[[:digit:]]?[[:digit:]][[:digit:]]?[[:digit:]].*[[:digit:]]?[[:digit:]]$"
 
+birthdayPatternSeparatedSpec :: Spec
+birthdayPatternSeparatedSpec = do
+  describe "birthdayPatternSpec" $ do
+    it "accepts 4 digits at the start and 2 digits at the end" $
+       "31.12.asd.12" `shouldSatisfy` matchesSeparatedBirthdayPattern
+    it "accepts 3 digits at the start and 2 digits at the end" $
+       "1.12.asd.12"  `shouldSatisfy` matchesSeparatedBirthdayPattern
+    it "accepts 2 digits at the start and 2 digits at the end" $
+       "1.1.asd.12"  `shouldSatisfy` matchesSeparatedBirthdayPattern
+    it "does not accept empty strings" $ do
+       "" `shouldSatisfy` not . matchesSeparatedBirthdayPattern
+    it "does not accept strings starting with a letter" $ do
+       "x12.34.asd.56" `shouldSatisfy` not . matchesSeparatedBirthdayPattern
+    it "does not accept strings ending with a letter" $ do
+       "12.34.asd.56.y" `shouldSatisfy` not . matchesSeparatedBirthdayPattern
+    it "does not accept strings without separators" $ do
+       "1234asd56" `shouldSatisfy` not . matchesSeparatedBirthdayPattern
+
+birthdayPatternSeparated :: [Char]
+birthdayPatternSeparated = "^[[:digit:]]?[[:digit:]]\\.[[:digit:]]?[[:digit:]]\\..*\\.[[:digit:]]?[[:digit:]]$"
+
 matchesBirthdayPattern :: T.Text -> Bool
-matchesBirthdayPattern word =  (T.unpack word) =~ birthdayPattern
+matchesBirthdayPattern =  matchesPattern birthdayPattern
+
+matchesSeparatedBirthdayPattern :: T.Text -> Bool
+matchesSeparatedBirthdayPattern =  matchesPattern birthdayPatternSeparated
+
+matchesPattern :: String -> T.Text -> Bool 
+matchesPattern pattern word = (T.unpack word) =~ pattern
+ 
 
 -- Testdata
 --------------------------------------------------------                            

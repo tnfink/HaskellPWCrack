@@ -2,7 +2,6 @@ module PWCrack.AttackMacOsXKeyChain(attackMacOsXKeyChain) where
 
 import qualified Data.Text as T
 import qualified Data.HashSet as S
-import Data.Hashable
 import Control.Monad
 import Control.Monad.Trans.State.Lazy
 import Control.Monad.IO.Class
@@ -25,8 +24,7 @@ attackMacOsXKeyChain keychain = do
   checkPasswords [] = return Nothing
   checkPasswords (password : passwords) = do
     currentState <- get
-    let passwordHash = hash password
-        testedStrings = testedStringHashes currentState
+    let testedStrings = testedStringHashes currentState
         numberOfTestedStrings = S.size testedStrings
         totalGeneratedDictionaryWords = numberOfTestedStrings + (skippedTests currentState)
     -- todo only print if the sum of skipped and tests divide 1000
@@ -35,7 +33,7 @@ attackMacOsXKeyChain keychain = do
                            " \t#"++(show numberOfTestedStrings) ++ 
                            " skipped "++(show $ skippedTests currentState)++
                            " \t total: "++(show totalGeneratedDictionaryWords))
-    if (S.member passwordHash testedStrings)
+    if (S.member password testedStrings)
       then do
         -- liftIO $ putStrLn ("skipping "++(T.unpack password))
         put currentState { skippedTests = 1+(skippedTests currentState)}
@@ -45,12 +43,12 @@ attackMacOsXKeyChain keychain = do
         if (foundPassword)
           then return $ Just password
           else do
-            put currentState { testedStringHashes = S.insert passwordHash testedStrings}
+            put currentState { testedStringHashes = S.insert password testedStrings}
             checkPasswords passwords
 
 
 data AttackState =
-  AttackState {  testedStringHashes :: S.HashSet Int
+  AttackState {  testedStringHashes :: S.HashSet T.Text
                  -- todo: check if it is ok to use the passwords in the set instead of their hash codes
               ,  skippedTests :: Int
               } deriving (Show)

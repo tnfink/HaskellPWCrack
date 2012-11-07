@@ -35,7 +35,7 @@ generalVariations = [ permutateUpperLowerCase ]
 
 generateListOfPasswords :: [T.Text]
 generateListOfPasswords =
-  allVariations
+  nameVariations
  where
   nameVariations = applyVariations nameDictionary;
   allVariations = applyGeneralVariations nameVariations;

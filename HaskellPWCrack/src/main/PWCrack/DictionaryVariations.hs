@@ -5,7 +5,6 @@ module PWCrack.DictionaryVariations( permutateUpperLowerCase
 
 import Data.Char
 import qualified Data.Text as T
-import Data.List
 
 type DictionaryVariation = T.Text -> [T.Text]
 

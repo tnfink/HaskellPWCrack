@@ -28,11 +28,14 @@ attackMacOsXKeyChain keychain = do
     let passwordHash = hash password
         testedStrings = testedStringHashes currentState
         numberOfTestedStrings = S.size testedStrings
+    -- todo only print if the sum of skipped and tests divide 1000
     when (numberOfTestedStrings `mod` 1000 == 0)
-      $ liftIO $ putStrLn ("test password #"++(show numberOfTestedStrings) ++ " skipped "++(show $ skippedTests currentState))
+      $ liftIO $ putStrLn ("test password "++ (T.unpack password) ++ 
+                           " \t#"++(show numberOfTestedStrings) ++ 
+                           " skipped "++(show $ skippedTests currentState))
     if (S.member passwordHash testedStrings)
       then do
-        liftIO $ putStrLn ("skipping "++(T.unpack password))
+        -- liftIO $ putStrLn ("skipping "++(T.unpack password))
         put currentState { skippedTests = 1+(skippedTests currentState)}
         checkPasswords passwords
       else do

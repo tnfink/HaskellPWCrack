@@ -28,11 +28,13 @@ attackMacOsXKeyChain keychain = do
     let passwordHash = hash password
         testedStrings = testedStringHashes currentState
         numberOfTestedStrings = S.size testedStrings
+        totalGeneratedDictionaryWords = numberOfTestedStrings + (skippedTests currentState)
     -- todo only print if the sum of skipped and tests divide 1000
-    when (numberOfTestedStrings `mod` 1000 == 0)
+    when (totalGeneratedDictionaryWords `mod` 1000 == 0)
       $ liftIO $ putStrLn ("test password "++ (T.unpack password) ++ 
                            " \t#"++(show numberOfTestedStrings) ++ 
-                           " skipped "++(show $ skippedTests currentState))
+                           " skipped "++(show $ skippedTests currentState)++
+                           " \t total: "++(show totalGeneratedDictionaryWords))
     if (S.member passwordHash testedStrings)
       then do
         -- liftIO $ putStrLn ("skipping "++(T.unpack password))
